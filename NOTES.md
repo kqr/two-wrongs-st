@@ -1,5 +1,5 @@
-TODO
-====
+NOTES
+=====
 
 1. Read in blog articles from directories ./published and ./drafts
 2. Filename has form "2015-08-20-dont-fear-the-bomb.txt" where the first part
@@ -9,3 +9,17 @@ TODO
 
 Possible development: store images and static content with posts, serve shit
 from the same domain!
+
+
+Test running funcitons
+----------------------
+
+    $ git clone thisrepo
+    $ cd thisrepo
+    $ stack build
+    $ stack exec -- ghci
+    Prelude> :load src/Main
+    *Main> parseFilename "2015-04-21-hello-there.txt"
+    Right (2015-04-21,Slug "hello-there")
+
+woop?
