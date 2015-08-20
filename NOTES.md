@@ -14,9 +14,8 @@ from the same domain!
 Test running funcitons
 ----------------------
 
-    $ git clone thisrepo
-    $ cd thisrepo
-    $ stack build
+    $ git clone git@github.com:kqr/two-wrongs-st.git
+    $ cd two-wrongs-st
     $ stack exec -- ghci
     Prelude> :load src/Main
     *Main> parseFilename "2015-04-21-hello-there.txt"
