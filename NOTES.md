@@ -14,8 +14,9 @@ from the same domain!
 Test running funcitons
 ----------------------
 
-    $ git clone thisrepo
-    $ cd thisrepo
+    $ git clone git@github.com:kqr/two-wrongs-st.git
+    $ cd two-wrongs-st
+    $ stack setup
     $ stack build
     $ stack exec -- ghci
     Prelude> :load src/Main
