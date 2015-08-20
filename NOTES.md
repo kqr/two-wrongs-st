@@ -16,6 +16,8 @@ Test running funcitons
 
     $ git clone git@github.com:kqr/two-wrongs-st.git
     $ cd two-wrongs-st
+    $ stack setup
+    $ stack build
     $ stack exec -- ghci
     Prelude> :load src/Main
     *Main> parseFilename "2015-04-21-hello-there.txt"
