@@ -12,6 +12,7 @@ data Blog = Blog
     { drafts :: [Post]
     , published :: [Post]
     }
+    deriving Show
 
 
 data Post = Post

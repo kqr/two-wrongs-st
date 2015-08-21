@@ -16,12 +16,19 @@ import Parsing (parsePost)
 
 
 main = do
-    drafts <- getPosts "drafts"
-    print drafts
+    blog <- getBlog
+    print blog
 
 
-getPosts :: FilePath -> IO [Post]
-getPosts directory = do
+getBlog :: IO Blog
+getBlog = do
+    drafts <- getPostsFrom "drafts"
+    published <- getPostsFrom "published"
+    return (Blog drafts published)
+
+
+getPostsFrom :: FilePath -> IO [Post]
+getPostsFrom directory = do
     files <- mapM readPost =<< getFilesIn directory
     let (errors, posts) = partitionEithers (map (uncurry parsePost) files)
     mapM error errors
