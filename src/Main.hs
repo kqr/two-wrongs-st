@@ -60,5 +60,5 @@ getFilesIn directory = do
 
 writeFileTo :: FilePath -> File -> IO ()
 writeFileTo directory (filename, content) =
-    output (directory </> decodeString filename <.> "html") content
+    output (directory </> decodeString filename <.> "html") (return content)
     
