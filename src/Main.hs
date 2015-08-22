@@ -66,5 +66,9 @@ getFilesIn directory = do
 
 writeFileTo :: FilePath -> File -> IO ()
 writeFileTo directory (filename, content) =
-    output (directory </> decodeString filename <.> "html") (return content)
+    let
+        extension = if filename == "atom" then "xml" else "html"
+        filepath = directory </> decodeString filename <.> extension
+    in
+        output filepath (return content)
     
