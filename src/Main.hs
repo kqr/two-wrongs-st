@@ -43,7 +43,7 @@ main = do
     mapM_ (writeFileTo "site_new") files
 
     echo "Copying over static content"
-    proc "cp" ["-r", "static", "site_new/."]
+    proc "cp" ["-r", "static", "site_new/."] empty
 
     oldExists <- testdir "site"
     when oldExists (echo "Overwriting old site..." >> rmtree "site")
