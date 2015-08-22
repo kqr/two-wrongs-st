@@ -19,13 +19,17 @@ First-time installation
 
     $ git clone git@github.com:kqr/two-wrongs-st.git
     $ cd two-wrongs-st
-    $ stack setup && stack build
+    $ stack setup
+    $ stack build
     $ cd example
     $ stack ghci
     Prelude> :load Main
     *Main> :main
-    [Post {title = "The First Post of the Blog!", slug = Slug "the-first-post-of-the-blog", datestamp = 1998-04-28, content = "\nHello! This is the first post of the blog. It's nice to get started.\n", author = (), tags = []},Post {title = "Valid Slug Test", slug = Slug "valid-slug-test", datestamp = 1999-05-04, content = "\nWell this is the second post\n", author = (), tags = []}]
+    *Main> -- At this point you should have a freshly generated site in
+    *Main> --     ./example/site
 
 Repeat from `stack ghci` for any future runs.
 
 If code has changed, run `:reload` inside GHCi to get new version of code.
+
+If the code has changed a lot, repeat from `stack build` to ensure a fresh build.
