@@ -8,8 +8,10 @@ module Main where
 import Prelude hiding (FilePath)
 import Control.Arrow (first)
 import Control.Foldl (list)
-import Data.Time.Clock
+import Data.Ini (readIniFile, Ini)
+import Data.Time.Clock (utctDay, getCurrentTime)
 import Filesystem.Path.CurrentOS (encodeString, decodeString)
+import System.Environment (getArgs)
 import Turtle
 
 import Types
@@ -21,12 +23,14 @@ import Views (generateBlog)
 -- just go on and do whatever's next. There should probably be
 -- better error handling but meh...
 freakout :: Either [String] a -> a
-freakout (Left es) = error (head es)
+freakout (Left es) = error (unlines es)
 freakout (Right a) = a
 
 
 main = do
-    blog <- getBlog
+    config <- either error return =<< readIniFile (encodeString "config.ini")
+
+    blog <- getBlog config
     files <- fmap freakout (generateBlog blog)
 
     newExists <- testdir "site_new"
@@ -39,12 +43,12 @@ main = do
     mv "site_new" "site"
 
 
-getBlog :: IO Blog
-getBlog = do
+getBlog :: Ini -> IO Blog
+getBlog config = do
     drafts <- fmap freakout (getPostsFrom "drafts")
     published <- fmap freakout (getPostsFrom "published")
     today <- fmap utctDay getCurrentTime
-    return (freakout (toBlog today drafts published))
+    return (freakout (toBlog config today drafts published))
 
 
 getPostsFrom :: FilePath -> IO (Either [String] [Post])

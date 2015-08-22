@@ -12,7 +12,7 @@ import Data.Text (Text)
 import qualified Data.Text as T (unpack)
 import Data.Text.Encoding (decodeUtf8)
 import Heist
-import Heist.Interpreted (renderTemplate, bindSplices, Splice)
+import Heist.Interpreted (renderTemplate, bindSplices, Splice, textSplice)
 import Lens.Family
 
 import Types
@@ -22,10 +22,16 @@ import Types
 type N = EitherT [String] IO
 
 
-makeView :: ByteString -> Slug -> Splices (Splice N) -> N (FilePath, Text)
-makeView template slug context = do
-    content <- generatePage template context
-    return (T.unpack (fromSlug slug), content)
+makeView :: Blog -> ByteString -> Slug -> Splices (Splice N) -> N File
+makeView blog template slug context =
+    let
+        slices = extraContext <> context
+        extraContext = do
+            "blogName" ## textSplice (name blog)
+            "blogURL" ## textSplice (url blog)
+    in do
+        content <- generatePage template slices
+        return (T.unpack (fromSlug slug), content)
 
 
 generatePage :: ByteString -> Splices (Splice N) -> N Text

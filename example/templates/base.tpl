@@ -2,11 +2,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Blog Title – <pageTitle/></title>
+    <title><blogName /> – <pageTitle/></title>
   </head>
   <body>
   <header>
-    <h1>Blog Title</h1>
+    <h1><a href="${blogURL}"><blogName /></a></h1>
     <h2>With a non-witty tagline</h2>
   </header>
   

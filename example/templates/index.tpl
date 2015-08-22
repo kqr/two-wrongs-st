@@ -3,7 +3,7 @@
 
   <ol>
     <latestPosts>
-      <li><datestamp /> – <a href="${entryURL}"><entryTitle /></a></li>
+      <li><datestamp /> – <a href="${entrySlug}"><entryTitle /></a></li>
     </latestPosts>
   </ol>
 </apply>
