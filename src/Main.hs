@@ -28,18 +28,25 @@ freakout (Right a) = a
 
 
 main = do
+    echo "Reading config file... "
     config <- either error return =<< readIniFile (encodeString "config.ini")
 
+    echo "Reading and parsing blog post files..."
     blog <- getBlog config
+    echo "Generating HTML for blog posts..."
     files <- fmap freakout (generateBlog blog)
 
+    echo "Writing out HTML to permanent storage..."
     newExists <- testdir "site_new"
     when newExists (rmtree "site_new")
     mkdir "site_new"
     mapM_ (writeFileTo "site_new") files
 
+    echo "Copying over static content"
+    proc "cp" ["-r", "static", "site_new/."]
+
     oldExists <- testdir "site"
-    when oldExists (rmtree "site")
+    when oldExists (echo "Overwriting old site..." >> rmtree "site")
     mv "site_new" "site"
 
 
