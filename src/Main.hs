@@ -8,6 +8,7 @@ module Main where
 import Prelude hiding (FilePath)
 import Control.Arrow (first)
 import Control.Foldl (list)
+import Data.Time.Clock
 import Filesystem.Path.CurrentOS (encodeString, decodeString)
 import Turtle
 
@@ -42,7 +43,8 @@ getBlog :: IO Blog
 getBlog = do
     drafts <- fmap freakout (getPostsFrom "drafts")
     published <- fmap freakout (getPostsFrom "published")
-    return (Blog drafts published)
+    today <- fmap utctDay getCurrentTime
+    return (freakout (toBlog today drafts published))
 
 
 getPostsFrom :: FilePath -> IO (Either [String] [Post])

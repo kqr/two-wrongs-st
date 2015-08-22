@@ -7,8 +7,10 @@ import Data.Attoparsec.Text
 import Data.Either (partitionEithers)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack)
+import Data.Text.Encoding (encodeUtf8)
 import Data.Time.Calendar (Day, fromGregorianValid)
 import System.FilePath.Posix (takeBaseName)
+import Text.XmlHtml (parseHTML)
 
 import Types
 
@@ -25,11 +27,12 @@ parsePost (filepath, filetext) =
     either (Left . annotate filepath) return $ do
         (datestamp, slug) <- parseFilename (pack (takeBaseName filepath))
         (title, content) <- parseContent filetext
+        document <- parseHTML filepath (encodeUtf8 content)
         return Post
             { title = title
             , slug = slug
             , datestamp = datestamp
-            , content = content
+            , content = document
             , author = ()
             , tags = []
             }
