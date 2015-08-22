@@ -8,7 +8,7 @@ import Data.ByteString.Lazy (toStrict)
 import Data.Monoid ((<>))
 import Data.Text hiding (length, take, head)
 import Data.Text.Encoding (decodeUtf8)
-import Data.Time.Calendar (Day)
+import Data.Time.Calendar (Day(ModifiedJulianDay))
 import Data.Time.Clock (UTCTime(UTCTime))
 import Data.Time.Format (formatTime, defaultTimeLocale)
 import Heist ((##))
@@ -69,7 +69,7 @@ latestPosts blog =
 atomView :: Blog -> EitherT [String] IO File
 atomView blog =
     makeView blog "atom" (Slug "atom") $ do
-        "lastEntry" ## textSplice (dayToTimestamp (datestamp (head (published blog))))
+        "lastEntry" ## textSplice (dayToTimestamp (case published blog of [] -> ModifiedJulianDay 0; (x:_) -> datestamp x))
         "latestPosts" ## flip mapSplices (take 20 (published blog)) $ \post ->
             runChildrenWithText $ do
                 "entryTitle" ## title post
