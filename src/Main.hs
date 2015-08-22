@@ -2,55 +2,63 @@
 
 module Main where
 
-import Prelude hiding (readFile)
-import Data.Either (partitionEithers)
-import Control.Monad (filterM)
-import Data.Text (Text)
-import Data.Text.IO (readFile)
-import qualified System.Directory (getDirectoryContents)
-import System.Directory (doesFileExist)
-import System.FilePath.Posix ((</>))
+-- The Turtle FilePath is deprecated, but unfortunately necessary in this
+-- module where a bunch of I/O happens through Turtle. Only in this module
+-- should the standard FilePath be hidden!
+import Prelude hiding (FilePath)
+import Control.Arrow (first)
+import Control.Foldl (list)
+import Filesystem.Path.CurrentOS (encodeString, decodeString)
+import Turtle
 
 import Types
-import Parsing (parsePost)
+import Parsing (parseAll)
+import Views (generateBlog)
+
+
+-- Freak out and crash if there's anything wrong, otherwise
+-- just go on and do whatever's next. There should probably be
+-- better error handling but meh...
+freakout :: Either [String] a -> a
+freakout (Left es) = error (head es)
+freakout (Right a) = a
 
 
 main = do
     blog <- getBlog
-    print blog
+    files <- fmap freakout (generateBlog blog)
+
+    newExists <- testdir "site_new"
+    when newExists (rmtree "site_new")
+    mkdir "site_new"
+    mapM_ (writeFileTo "site_new") files
+
+    oldExists <- testdir "site"
+    when oldExists (rmtree "site")
+    mv "site_new" "site"
 
 
 getBlog :: IO Blog
 getBlog = do
-    drafts <- getPostsFrom "drafts"
-    published <- getPostsFrom "published"
+    drafts <- fmap freakout (getPostsFrom "drafts")
+    published <- fmap freakout (getPostsFrom "published")
     return (Blog drafts published)
 
 
-getPostsFrom :: FilePath -> IO [Post]
+getPostsFrom :: FilePath -> IO (Either [String] [Post])
 getPostsFrom directory = do
-    files <- mapM readPost =<< getFilesIn directory
-    let (errors, posts) = partitionEithers (map (uncurry parsePost) files)
-    mapM error errors
-    return posts
+    files <- fold (getFilesIn directory) list
+    return (parseAll (map (first encodeString) files))
 
 
-getFilesIn :: FilePath -> IO [FilePath]
+getFilesIn :: FilePath -> Shell (FilePath, Text)
 getFilesIn directory = do
-    filepaths <- getDirectoryContents directory
-    filterM doesFileExist filepaths
+    filepaths <- find (suffix ".txt") directory
+    filetext <- strict (input filepaths)
+    return (filepaths, filetext)
 
 
-getDirectoryContents :: FilePath -> IO [FilePath]
-getDirectoryContents directory = do
-    filenames <- System.Directory.getDirectoryContents directory
-    return (map (directory </>) filenames)
-
-
-readPost :: FilePath -> IO (FilePath, Text)
-readPost filepath = do
-    filetext <- readFile filepath
-    return (filepath, filetext)
-
-
-
+writeFileTo :: FilePath -> File -> IO ()
+writeFileTo directory (filename, content) =
+    output (directory </> decodeString filename <.> "html") content
+    

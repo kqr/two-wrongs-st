@@ -4,8 +4,14 @@ import Data.Text (Text)
 import Data.Time.Calendar (Day)
 
 
+type File = (FilePath, Text)
+
+
 -- Wrapper for slugs so we don't mix 'em up with regular text
-data Slug = Slug Text deriving Show
+data Slug = Slug
+    { fromSlug :: Text
+    }
+    deriving Show
 
 
 data Blog = Blog

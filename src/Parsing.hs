@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Parsing (parsePost) where
+module Parsing (parseAll) where
 
 import Control.Applicative (liftA2)
 import Data.Attoparsec.Text
+import Data.Either (partitionEithers)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack)
 import Data.Time.Calendar (Day, fromGregorianValid)
@@ -12,8 +13,15 @@ import System.FilePath.Posix (takeBaseName)
 import Types
 
 
-parsePost :: FilePath -> Text -> Either String Post
-parsePost filepath filetext =
+parseAll :: [File] -> Either [String] [Post]
+parseAll files =
+    case partitionEithers (map parsePost files) of
+        ([], posts) -> Right posts
+        (errors, _) -> Left errors
+
+
+parsePost :: File -> Either String Post
+parsePost (filepath, filetext) =
     either (Left . annotate filepath) return $ do
         (datestamp, slug) <- parseFilename (pack (takeBaseName filepath))
         (title, content) <- parseContent filetext
