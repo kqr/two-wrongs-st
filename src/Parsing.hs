@@ -43,18 +43,23 @@ annotate filepath s =
     "Invalid post '" <> filepath <> "': " <> s
 
 
--- Parses a multi-line string where the first line is assumed to be a title
--- and then comes an empty line and then everything else is content
 parseContent :: Text -> Either String (Text, Text)
 parseContent =
-    parseOnly (liftA2 (,) (takeTill isEndOfLine <* endOfLine) takeText)
+    parseOnly $ do
+        title <- takeTill isEndOfLine    -- entire first line is title
+        endOfLine                        -- skip past a newline
+        body <- takeText                 -- the rest of the file is body text
+        return (title, body)
 
 
--- parses a filename in the form of "2015-08-21-this-is-a-slug"
--- into a tuple (2015-04-21,Slug "this-is-a-slug")
 parseFilename :: Text -> Either String (Day, Slug)
 parseFilename =
-    parseOnly (liftA2 (,) dateParser slugParser <* endOfInput <?> "invalid slug")
+    parseOnly $ do
+        day <- dateParser              -- first comes date
+        char '-'                       -- followed by a dash
+        slug <- slugParser             -- then the slug
+        endOfInput <?> "invalid slug"  -- if anything is unparsed, slug was invalid
+        return (day, slug)
 
 
 -- parser that consumes something like "2015-08-21" and turns it into a
@@ -66,7 +71,6 @@ dateParser = do
     month <- decimal <?> "failed parsing month"
     char '-'
     day <- decimal <?> "failed parsing day"
-    char '-'
     maybe (fail "invalid date") return (fromGregorianValid year month day)
 
 
