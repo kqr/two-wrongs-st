@@ -1,9 +1,6 @@
 NOTES
 =====
 
-1. Poop out an atom feed
-
-
 Possible development: store images and static content with posts, serve shit
 from the same domain!
 

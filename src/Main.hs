@@ -29,7 +29,7 @@ freakout (Right a) = a
 
 main = do
     echo "Reading config file... "
-    config <- either error return =<< readIniFile (encodeString "config.ini")
+    config <- either error return =<< readIniFile "config.ini"
 
     echo "Reading and parsing blog post files..."
     blog <- getBlog config
