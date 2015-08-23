@@ -3,8 +3,9 @@
 module Types where
 
 import Data.Ini
-import Data.List (group, sort)
+import Data.List (group, sort, sortOn)
 import Data.Maybe (mapMaybe, listToMaybe)
+import Data.Ord (Down(Down))
 import Data.Text (Text, unpack)
 import Data.Time.Calendar (Day)
 import Text.XmlHtml (Document)
@@ -36,7 +37,7 @@ toBlog config today drafts published =
         getDuplicates = mapMaybe (listToMaybe . drop 1) . group . sort
         duplicates = getDuplicates (map slug (drafts ++ published))
         unpublished = filter ((> today) . datestamp) published ++ drafts
-        actualPublished = filter ((<= today) . datestamp) published
+        actualPublished = sortOn (Down . datestamp) (filter ((<= today) . datestamp) published)
         coerce = either (Left . (:[])) return
     in do
         blogName <- coerce (lookupValue "general" "title" config)
