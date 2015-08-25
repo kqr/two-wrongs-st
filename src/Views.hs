@@ -32,7 +32,7 @@ generateBlog blog =
         about <- aboutView blog
         atom <- atomView blog
         posts <- mapM (postView blog) (published blog <> unpublished blog)
-        taggeds <- mapM (taggedByView blog) (concatMap tags (published blog))
+        taggeds <- mapM (taggedView blog) (concatMap tags (published blog))
         return (index : about : atom : taggeds ++ posts)
 
 
@@ -50,10 +50,10 @@ aboutView blog =
         "count" ## textSplice (pack (show (length (published blog))))
 
 
-taggedByView :: Blog -> Slug -> EitherT [String] IO File
-taggedByView blog tag =
+taggedView :: Blog -> Slug -> EitherT [String] IO File
+taggedView blog tag =
     makeView blog "tagged" (Slug "tagged_" <> tag) $ do
-        "pageTitle" ## textSplice ("Tagged by " <> fromSlug tag)
+        "pageTitle" ## textSplice ("Tagged with " <> fromSlug tag)
         "taggedPosts" ## latestPosts blog (\post -> elem tag (tags post))
 
 
