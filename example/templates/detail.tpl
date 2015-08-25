@@ -3,13 +3,15 @@
 
     <h2><datestamp /></h2>
 
-    <p>Tagged with:</p>
+    <isTagged>
+        <p>Tagged with:</p>
 
-    <ul>
-        <tags>
-            <li><a href="${tagURL}"><tagName /></a></li>
-        </tags>
-    </ul>
+        <ul>
+            <tags>
+                <li><a href="${tagURL}"><tagName /></a></li>
+            </tags>
+        </ul>
+    </isTagged>
 
     <content />
 </apply>

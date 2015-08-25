@@ -2,17 +2,18 @@
 
 module Views (generateBlog) where
 
+import Control.Monad (unless)
 import Control.Monad.Trans.Either (EitherT, runEitherT)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Monoid ((<>))
-import Data.Text hiding (length, take, head, concatMap, filter)
+import Data.Text hiding (length, take, head, concatMap, filter, null)
 import Data.Text.Encoding (decodeUtf8)
 import Data.Time.Calendar (Day(ModifiedJulianDay))
 import Data.Time.Clock (UTCTime(UTCTime))
 import Data.Time.Format (formatTime, defaultTimeLocale)
 import Heist ((##))
-import Heist.Interpreted (Splice, textSplice, mapSplices, runChildrenWithText, runNodeList)
+import Heist.Interpreted (Splice, textSplice, mapSplices, runChildrenWith, runChildrenWithText, runNodeList)
 import Text.XmlHtml (docContent, renderHtmlFragment, Encoding(UTF8))
 
 import Types
@@ -63,10 +64,15 @@ postView blog post =
         "content" ## runNodeList (docContent (content post))
         "datestamp" ## textSplice (pack (show (datestamp post)))
         "timestamp" ## textSplice (dayToTimestamp (datestamp post))
-        "tags" ## flip mapSplices (tags post) $ \tag ->
-            runChildrenWithText $ do
-                "tagName" ## fromSlug tag
-                "tagURL" ## "tagged_" <> fromSlug tag
+        "isTagged" ##
+            if null (tags post) then
+                return mempty
+            else do
+                runChildrenWith $ do
+                    "tags" ## flip mapSplices (tags post) $ \tag ->
+                        runChildrenWithText $ do
+                            "tagName" ## fromSlug tag
+                            "tagURL" ## "tagged_" <> fromSlug tag
 
 
 latestPosts :: Monad n => Blog -> (Post -> Bool) -> Splice n
