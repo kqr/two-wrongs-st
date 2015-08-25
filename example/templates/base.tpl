@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title><blogName /> – <pageTitle/></title>
+    <link rel="stylesheet" href="static/standard.css" />
   </head>
   <body>
   <header>

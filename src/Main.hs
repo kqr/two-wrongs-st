@@ -33,6 +33,7 @@ main = do
 
     echo "Reading and parsing blog post files..."
     blog <- getBlog config
+    mapM_ (\post -> print (tags post)) (published blog)
     echo "Generating HTML for blog posts..."
     files <- fmap freakout (generateBlog blog)
 

@@ -55,7 +55,7 @@ data Post = Post
     , datestamp :: Day
     , content :: Document
     , author :: ()         -- for a more civilized age
-    , tags :: [()]         -- also for a more civilized age
+    , tags :: [Slug]
     }
     deriving Show
 
@@ -65,4 +65,8 @@ data Slug = Slug
     { fromSlug :: Text
     }
     deriving (Show, Eq, Ord)
+
+instance Monoid Slug where
+    mempty = Slug ""
+    mappend (Slug a) (Slug b) = Slug (mappend a b)
 

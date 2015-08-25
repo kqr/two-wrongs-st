@@ -1,3 +1,4 @@
 The First Post of the Blog!
+Tags: testing-tags interesting vim-edited
 
 Hello! This is the first post of the blog. It's nice to get started.
