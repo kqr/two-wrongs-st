@@ -5,11 +5,12 @@ module Parsing (parseAll) where
 import Control.Applicative (liftA2, (<|>))
 import Data.Attoparsec.Text
 import Data.Either (partitionEithers)
+import Data.List (intersperse)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Time.Calendar (Day, fromGregorianValid)
-import System.FilePath.Posix (takeBaseName)
+import System.FilePath.Posix (takeBaseName, splitDirectories, takeDirectory)
 import Text.XmlHtml (parseHTML)
 
 import Types
@@ -25,7 +26,10 @@ parseAll files =
 parsePost :: File -> Either String Post
 parsePost (filepath, filetext) =
     either (Left . annotate filepath) return $ do
-        (datestamp, slug) <- parseFilename (pack (takeBaseName filepath))
+        (datestamp, baseSlug) <- parseFilename (pack (takeBaseName filepath))
+        let moreSlugBits = map pack (drop 1 (splitDirectories (takeDirectory filepath)))
+        parsedBits <- mapM (parseOnly (slugParser <* endOfInput)) moreSlugBits
+        let slug = mconcat (intersperse (Slug "-") parsedBits) <> Slug "-" <> baseSlug
         (title, tags, content) <- parseContent filetext
         document <- parseHTML filepath (encodeUtf8 content)
         return Post
