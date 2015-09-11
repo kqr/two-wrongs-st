@@ -29,7 +29,11 @@ parsePost (filepath, filetext) =
         (datestamp, baseSlug) <- parseFilename (pack (takeBaseName filepath))
         let moreSlugBits = map pack (drop 1 (splitDirectories (takeDirectory filepath)))
         parsedBits <- mapM (parseOnly (slugParser <* endOfInput)) moreSlugBits
-        let slug = mconcat (intersperse (Slug "-") parsedBits) <> Slug "-" <> baseSlug
+        let slug =
+              if null parsedBits then
+                baseSlug
+              else
+                mconcat (intersperse (Slug "-") parsedBits) <> Slug "-" <> baseSlug
         (title, tags, content) <- parseContent filetext
         document <- parseHTML filepath (encodeUtf8 content)
         return Post
