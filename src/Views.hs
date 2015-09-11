@@ -5,15 +5,18 @@ module Views (generateBlog) where
 import Control.Monad (unless)
 import Control.Monad.Trans.Either (EitherT, runEitherT)
 import Data.ByteString.Builder (toLazyByteString)
-import Data.ByteString.Lazy (toStrict)
+import qualified Data.ByteString.Lazy as B (toStrict)
 import Data.Monoid ((<>))
 import Data.Text hiding (length, take, head, concatMap, filter, null)
 import Data.Text.Encoding (decodeUtf8)
+import qualified Data.Text.Lazy as T (toStrict)
+import Data.Text.Lazy.Builder (toLazyText)
 import Data.Time.Calendar (Day(ModifiedJulianDay))
 import Data.Time.Clock (UTCTime(UTCTime))
 import Data.Time.Format (formatTime, defaultTimeLocale)
 import Heist ((##))
 import Heist.Interpreted (Splice, textSplice, mapSplices, runChildrenWith, runChildrenWithText, runNodeList)
+import qualified HTMLEntities.Builder as Escape (text)
 import Text.XmlHtml (docContent, renderXmlFragment, Encoding(UTF8))
 
 import Types
@@ -90,9 +93,9 @@ atomView blog =
         "lastEntry" ## textSplice (dayToTimestamp (case published blog of [] -> ModifiedJulianDay 0; (x:_) -> datestamp x))
         "latestPosts" ## flip mapSplices (take 20 (published blog)) $ \post ->
             runChildrenWithText $ do
-                "entryTitle" ## title post
+                "entryTitle" ## T.toStrict (toLazyText (Escape.text (title post)))
                 "entrySlug" ## fromSlug (slug post)
                 "timestamp" ## dayToTimestamp (datestamp post)
-                "escapedContent" ## decodeUtf8 (toStrict (toLazyByteString (renderXmlFragment UTF8 (docContent (content post)))))
+                "escapedContent" ## decodeUtf8 (B.toStrict (toLazyByteString (renderXmlFragment UTF8 (docContent (content post)))))
 
 
