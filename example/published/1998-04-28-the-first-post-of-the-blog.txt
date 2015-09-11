@@ -1,4 +1,6 @@
 The First Post of the Blog!
 Tags: testing-tags interesting vim-edited
 
-Hello! This is the first post of the blog. It's nice to get started.
+<p>Hello! This is the first post of the blog. It's nice to get started.</p>
+
+<p>What's interesting about this post is <a href="http://example.com/testing?with=1&amp;some=params">THE LINK</a>.</p>

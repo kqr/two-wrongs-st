@@ -14,7 +14,7 @@ import Data.Time.Clock (UTCTime(UTCTime))
 import Data.Time.Format (formatTime, defaultTimeLocale)
 import Heist ((##))
 import Heist.Interpreted (Splice, textSplice, mapSplices, runChildrenWith, runChildrenWithText, runNodeList)
-import Text.XmlHtml (docContent, renderHtmlFragment, Encoding(UTF8))
+import Text.XmlHtml (docContent, renderXmlFragment, Encoding(UTF8))
 
 import Types
 import Html (makeView)
@@ -93,6 +93,6 @@ atomView blog =
                 "entryTitle" ## title post
                 "entrySlug" ## fromSlug (slug post)
                 "timestamp" ## dayToTimestamp (datestamp post)
-                "escapedContent" ## decodeUtf8 (toStrict (toLazyByteString (renderHtmlFragment UTF8 (docContent (content post)))))
+                "escapedContent" ## decodeUtf8 (toStrict (toLazyByteString (renderXmlFragment UTF8 (docContent (content post)))))
 
 
