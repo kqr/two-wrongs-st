@@ -2,4 +2,4 @@ flags: {}
 packages:
 - '.'
 extra-deps: [html-entities-1.1.0.0]
-resolver: nightly-2015-06-30
+resolver: lts-5.1
