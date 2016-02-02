@@ -1,0 +1,3 @@
+This file is here to ensure that dotfiles do not trip the generator up.
+Many OSes insert their own dotfiles, so having the generator react to
+them would probably be a bad idea.

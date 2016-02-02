@@ -9,6 +9,7 @@ import Prelude hiding (FilePath)
 import Control.Arrow (first)
 import Control.Foldl (list)
 import Data.Ini (readIniFile, Ini)
+import Data.Text (pack)
 import Data.Time.Clock (utctDay, getCurrentTime)
 import Filesystem.Path.CurrentOS (encodeString, decodeString)
 import System.Environment (getArgs)
@@ -65,10 +66,15 @@ getPostsFrom directory = do
 
 
 getFilesIn :: FilePath -> Shell (FilePath, Text)
-getFilesIn directory = do
-    filepaths <- find (suffix ".txt") directory
-    filetext <- strict (input filepaths)
-    return (filepaths, filetext)
+getFilesIn directory =
+    let
+        directoryName = pack (encodeString directory)
+        pathPrefix = text directoryName <> "/"
+        fileName = plus (noneOf ".") <> ".txt"
+    in do
+        filepaths <- find (pathPrefix <> fileName) directory
+        filetext <- strict (input filepaths)
+        return (filepaths, filetext)
 
 
 writeFileTo :: FilePath -> File -> IO ()
