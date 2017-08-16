@@ -51,7 +51,7 @@ annotate filepath s =
     "Invalid post '" <> filepath <> "': " <> s
 
 
-parseContent :: Text -> Either String (Text, [Slug], Text)
+parseContent :: Text -> Either String (Text, [Slug Text], Text)
 parseContent =
     parseOnly $ do
         title <- takeTill isEndOfLine    -- entire first line is title
@@ -62,7 +62,7 @@ parseContent =
         return (title, tags, body)
 
 
-tagParser :: Parser [Slug]
+tagParser :: Parser [Slug Text]
 tagParser = do
     string "Tags: "
     tags <- sepBy slugParser space
@@ -70,7 +70,7 @@ tagParser = do
     return tags
 
 
-parseFilename :: Text -> Either String (Day, Slug)
+parseFilename :: Text -> Either String (Day, Slug Text)
 parseFilename =
     parseOnly $ do
         day <- dateParser              -- first comes date
@@ -92,7 +92,7 @@ dateParser = do
     maybe (fail "invalid date") return (fromGregorianValid year month day)
 
 
-slugParser :: Parser Slug
+slugParser :: Parser (Slug Text)
 slugParser =
     fmap Slug (takeWhile1 (inClass "a-z0-9-") <?> "slug can not be empty!")
 

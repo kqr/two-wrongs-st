@@ -22,7 +22,7 @@ import Types
 type N = EitherT [String] IO
 
 
-makeView :: Blog -> ByteString -> Slug -> Splices (Splice N) -> N File
+makeView :: Blog -> ByteString -> Slug Text -> Splices (Splice N) -> N File
 makeView blog template slug context =
     let
         slices = extraContext <> context

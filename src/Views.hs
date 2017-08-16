@@ -8,6 +8,7 @@ import Data.ByteString.Builder (toLazyByteString)
 import qualified Data.ByteString.Lazy as B (toStrict)
 import Data.Monoid ((<>))
 import Data.Text hiding (length, take, head, concatMap, filter, null)
+import qualified Data.Text as Text
 import Data.Text.Encoding (decodeUtf8)
 import qualified Data.Text.Lazy as T (toStrict)
 import Data.Text.Lazy.Builder (toLazyText)
@@ -18,6 +19,7 @@ import Heist ((##))
 import Heist.Interpreted (Splice, textSplice, mapSplices, runChildrenWith, runChildrenWithText, runNodeList)
 import qualified HTMLEntities.Builder as Escape (text)
 import Text.XmlHtml (docContent, renderXmlFragment, Encoding(UTF8))
+import qualified Data.List as List
 
 import Types
 import Html (makeView)
@@ -43,6 +45,7 @@ indexView :: Blog -> EitherT [String] IO File
 indexView blog =
     makeView blog "index" (Slug "index") $ do
         "pageTitle" ## textSplice "Index"
+        "popularTags" ## popularTags blog
         "latestPosts" ## latestPosts blog (const True)
 
 
@@ -53,7 +56,7 @@ aboutView blog =
         "count" ## textSplice (pack (show (length (published blog))))
 
 
-taggedView :: Blog -> Slug -> EitherT [String] IO File
+taggedView :: Blog -> Slug Text -> EitherT [String] IO File
 taggedView blog tag =
     makeView blog "tagged" (Slug "tagged_" <> tag) $ do
         "pageTitle" ## textSplice ("Tagged with " <> fromSlug tag)
@@ -76,6 +79,21 @@ postView blog post =
                         runChildrenWithText $ do
                             "tagName" ## fromSlug tag
                             "tagURL" ## "tagged_" <> fromSlug tag
+
+
+popularTags :: Monad n => Blog -> Splice n
+popularTags blog =
+    let
+        allTags = concatMap tags (published blog)
+        groupedTags = List.group (List.sort allTags)
+        byPopularity = List.sortOn (negate . List.length) groupedTags
+        flattened = List.map head byPopularity
+        limited = take 8 flattened
+    in
+        flip mapSplices limited $ \tag ->
+            runChildrenWithText $ do
+                "tagName" ## fromSlug tag
+                "tagURL" ## "tagged_" <> fromSlug tag
 
 
 latestPosts :: Monad n => Blog -> (Post -> Bool) -> Splice n

@@ -51,22 +51,25 @@ toBlog config today drafts published =
 
 data Post = Post
     { title :: Text
-    , slug :: Slug
+    , slug :: Slug Text
     , datestamp :: Day
     , content :: Document
     , author :: ()         -- for a more civilized age
-    , tags :: [Slug]
+    , tags :: [Slug Text]
     }
     deriving Show
 
 
 -- Wrapper for slugs so we don't mix 'em up with regular text
-data Slug = Slug
-    { fromSlug :: Text
+data Slug a = Slug
+    { fromSlug :: a
     }
     deriving (Show, Eq, Ord)
 
-instance Monoid Slug where
-    mempty = Slug ""
+instance Monoid a => Monoid (Slug a) where
+    mempty = Slug mempty
     mappend (Slug a) (Slug b) = Slug (mappend a b)
+
+instance Functor Slug where
+    fmap f (Slug a) = Slug (f a)
 
